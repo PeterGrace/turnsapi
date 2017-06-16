@@ -12,13 +12,14 @@ from turnsapi.models.basic import Base
 class Player(Base):
     __tablename__ = 'players'
     id = Column(Integer, primary_key=True)
-    logins = relationship("OAuthModel", back_populates="parent")
+    logins = relationship("OAuthModel", back_populates="player")
 
 
 class Game(Base):
     __tablename__ = 'game_data'
     id = Column(Integer, primary_key=True)
     player = Column(Integer, ForeignKey('players.id'), nullable=False)
+    food = Column(Integer, nullable=False)
     turns = Column(Integer, nullable=False)
     lands = Column(Integer, nullable=False)
     serfs = Column(Integer, nullable=False)
