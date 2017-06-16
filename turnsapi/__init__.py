@@ -44,12 +44,13 @@ def main(global_config, **settings):
 
     config.include('pyramid_mako')
     config.include('velruse.providers.google_oauth2')
+    config.include('cornice')
 
     config.set_authentication_policy(authn_policy)
     config.set_authorization_policy(authz_policy)
     config.add_google_oauth2_login_from_settings(prefix='velruse.google.')
 
-    config.add_request_method(LookupUser,'user',reify=True)
+    config.add_request_method(LookupUser,'user',reify=False)
     config.add_request_method(GetDB,'db',reify=True)
 
     #i18n

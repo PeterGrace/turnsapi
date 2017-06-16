@@ -59,7 +59,10 @@
             </ul>
 <%
   from velruse import login_url
-  logged_in=request.user
+  from pyramid.httpexceptions import HTTPFound
+  logged_in=request.user()
+  if isinstance(logged_in, HTTPFound):
+      return logged_in
   loginurl=login_url(request, 'google')
   logouturl=request.route_url('logout')
 %>
