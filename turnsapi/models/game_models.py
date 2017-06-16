@@ -24,4 +24,5 @@ class Game(Base):
     lands = Column(Integer, nullable=False, server_default="0")
     serfs = Column(Integer, nullable=False, server_default="0")
     gold = Column(Integer, nullable=False, server_default="0")
+    taxrate = Column(Integer, nullable=False, server_default="5")
     granaries = Column(Integer, nullable=False, server_default="0")
