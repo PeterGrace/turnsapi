@@ -4,8 +4,8 @@ import time
 from turnsapi.models.game_models import Game
 
 class EndGameException(Exception):
-    def __init__(self):
-        self.super()
+    def __init__(self, message=None):
+        super(EndGameException, self).__init__()
 
 weather_map = [
     'NEVER_WILL_HAPPEN',    
@@ -31,9 +31,10 @@ weather_map = [
     'Bounteous Rainfall'
 ]
 
-SERF_EATS = 5
-SERF_PER_LAND = 500
-SERF_WAGES = 3
+SERF_EATS = 1
+SERF_PER_LAND = 100
+FOOD_PER_LAND_MINIMUM = 100
+SERF_WAGES = 7
 GOLD_PER_FOOD = 10
 GRANARY_STORAGE = 10000
 
@@ -87,12 +88,13 @@ class GameLogic:
     
     def check_consumption(self):
         consumption = (self.serfs*SERF_EATS)
-        self.messages.append("Your serfs have eaten {} food.".format(consumption))
+        self.messages.append("Your {} serfs have eaten {} food.".format(self.serfs, consumption))
         self.food -= consumption
         if self.food < 0:
             self.food = 0
-            self.messages.append("Widespread famine has culled your population.")
-            self.serfs = int(self.serfs * .15)
+            deaths = int(self.serfs * .15)
+            self.serfs -= deaths
+            self.messages.append("Widespread famine has culled your population.  You lose {} serfs.".format(deaths))
             
 
     def check_spoilage(self):
@@ -112,8 +114,9 @@ class GameLogic:
 
         if ((self.serfs >= 2) and (self.serfs <= max_serfs)):
             if self.food >= 5:
-                self.messages.append("Your harvests have caused our serfs to have children")
-                self.serfs += int((self.serfs/2))
+                numkids =int((self.serfs/2)) 
+                self.messages.append("Your harvests have caused our serfs to have {} children".format(numkids))
+                self.serfs += numkids
             else:
                 self.messages.append("You barely had enough food to feed our population, sire.")
         elif (self.serfs == 1):
@@ -129,14 +132,15 @@ class GameLogic:
     def check_taxes(self):
         taxes = (self.serfs*SERF_WAGES)*(self.taxrate/100)
         self.gold += taxes
-        self.messages.append("You collected {} in taxes this turn.".format(taxes))
+        self.messages.append("With a tax rate of {}%, You collected {} in taxes this turn.".format(self.taxrate, taxes))
 
 
     def check_growth(self):
         weather = self.check_weather()
-        plusfood = abs(int(((((weather['value']+100)/100)*self.lands)+1)))
+        plusfood = FOOD_PER_LAND_MINIMUM*self.lands
+        plusfood = int(plusfood*((self.d20_interp(weather['value'])/100)+1))
         self.food += plusfood
-        self.messages.append("This turn, the weather was {}.  You gained {} food.".format(weather['word'], plusfood))
+        self.messages.append("This turn, the weather was {}.  You gained {} food.".format(weather['word'], int(plusfood)))
 
     def check_weather(self):
         roll = self.d20()

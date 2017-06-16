@@ -60,6 +60,9 @@ def post_turn(request):
         initialize_game(player)
         game = DBSession.query(Game).filter(Player.id==player.id).one()
 
+    if game.turns <= 0:
+        return {"messages": "No more turns for today!  Check in tomorrow!"}
+
     gl = GameLogic(game)
 
     logging.info("POSTS: {}".format(request.POST))
