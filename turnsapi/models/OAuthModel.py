@@ -15,6 +15,3 @@ class OAuthModel(Base):
     AccessLevel = Column(Integer)
     player_id = Column(Integer, ForeignKey('players.id'))
     player = relationship("Player", back_populates="logins")
-
-Index('EmailIndex', OAuthModel.email, unique=True, mysql_length=255)
-
